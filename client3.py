@@ -32,17 +32,33 @@ N = 500
 def getDataPoint(quote):
     """ Produce all the needed values to generate a datapoint """
     """ ------------- Update this function ------------- """
+    """getDataPoint function should return correct tuple of stock name, bid_price, ask_price and price. """
+    """----------Note: price of a stock = average of bid and ask----------"""
+
     stock = quote['stock']
     bid_price = float(quote['top_bid']['price'])
     ask_price = float(quote['top_ask']['price'])
-    price = bid_price
+    price = round(((bid_price + ask_price) / 2), 2)
+    #price = format(((bid_price + ask_price) / 2), ".2f")
+    #price = round(price, 2)
     return stock, bid_price, ask_price, price
 
 
 def getRatio(price_a, price_b):
     """ Get ratio of price_a and price_b """
     """ ------------- Update this function ------------- """
-    return 1
+    """--getRatio function should return the ratio of the two stock prices--"""
+    #define ratio
+    ratio = price_a/price_b
+    """noticed we are getting ratios of 1.0. Are we using the same price for a & b?
+       Should we make a list of price_a & price_b?
+       will use dictionary because Lists dont have keys."""
+
+    #added this because of the edge case proble of dividing by zero.
+    if (price_b == 0):
+        return
+
+    return ratio
 
 
 # Main
@@ -52,8 +68,15 @@ if __name__ == "__main__":
         quotes = json.loads(urllib.request.urlopen(QUERY.format(random.random())).read())
 
         """ ----------- Update to get the ratio --------------- """
+        #dictionary will be 'Name of Stock' : 'Price pf stock'
+        prices = {}
         for quote in quotes:
             stock, bid_price, ask_price, price = getDataPoint(quote)
-            print("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
+            #will insert stock variable (->name) as key, and price of stock as value
+            prices[stock] = price
+            #added format to price so we can display prices in normal currency format. '123.20' instead of '123.2'
+            print("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, format(price, ".2f")))
 
-        print("Ratio %s" % getRatio(price, price))
+
+        #will now need to get price of stock a, and stock b
+        print("Ratio %s" % getRatio(prices["ABC"], prices["DEF"]))
